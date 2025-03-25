@@ -64,9 +64,25 @@ if %FOUND%==0 (
 echo Found MSBuild at %MSBUILD_PATH%
 echo Building TimeLoggerPlugin...
 
+REM Download NuGet.exe if it doesn't exist
+if not exist "NuGet.exe" (
+    echo Downloading NuGet.exe...
+    powershell -Command "Invoke-WebRequest -Uri https://dist.nuget.org/win-x86-commandline/latest/nuget.exe -OutFile NuGet.exe"
+    if not exist "NuGet.exe" (
+        echo Failed to download NuGet.exe. Will attempt to build without explicit restore.
+    ) else (
+        echo NuGet.exe downloaded successfully.
+    )
+)
+
 REM Restore NuGet packages
 echo Restoring NuGet packages...
-%MSBUILD_PATH% TimeLoggerPlugin.csproj /t:Restore /p:Configuration=Release
+if exist "NuGet.exe" (
+    .\NuGet.exe restore TimeLoggerPlugin.csproj
+) else (
+    echo Attempting to restore packages using MSBuild...
+    %MSBUILD_PATH% TimeLoggerPlugin.csproj /t:Restore /p:Configuration=Release
+)
 
 REM Build the project
 echo Building project...
