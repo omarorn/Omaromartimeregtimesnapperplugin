@@ -1,21 +1,14 @@
+# Updated .gitignore for TimeLoggerPlugin
+
 # Build results
 [Dd]ebug/
-[Dd]ebugPublic/
 [Rr]elease/
-[Rr]eleases/
-x64/
-x86/
-[Ww][Ii][Nn]32/
-[Aa][Rr][Mm]/
-[Aa][Rr][Mm]64/
-bld/
 [Bb]in/
 [Oo]bj/
 
 # Visual Studio files
 .vs/
 *.user
-*.userosscache
 *.suo
 *.userprefs
 *.dbmdl
@@ -30,18 +23,41 @@ _ReSharper*/
 
 # NuGet Packages
 *.nupkg
-# NuGet Symbol Packages
 *.snupkg
-# The packages folder can be ignored because of Package Restore
 **/[Pp]ackages/*
-# except build/, which is used as an MSBuild target.
 !**/[Pp]ackages/build/
-# NuGet v3's project.json files produces more ignorable files
 *.nuget.props
 *.nuget.targets
 
 # TimeSnapper Plugin specific
 *.dll
 !ITimeSnapperPlugIn.dll
-
 *.pdb
+
+# Generated files
+*.log
+*.tmp
+*.cache
+*.bak
+*.swp
+*.DS_Store
+*.Thumbs.db
+
+# Media files
+*.gif
+*.mp4
+*.wav
+*.png
+
+# Other unnecessary files
+*.url
+*.rtf
+*.bundle.js
+*.js.map
+*.config
+*.old.dll
+*.json
+*.txt
+
+# Exclude NuGet.exe
+NuGet.exe
