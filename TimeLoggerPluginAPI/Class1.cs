@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Net.Http;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace TimeLoggerPluginAPI
 {
@@ -16,102 +19,125 @@ namespace TimeLoggerPluginAPI
     public class TimeLoggerPlugin : ITimeSnapperPlugIn
     {
         private readonly string ENDPOINT_URL = "https://npsbvriuvfksuvnalrke.supabase.co/functions/v1/timesnapper-events";
-        private readonly System.Net.Http.HttpClient httpClient;
+        private readonly HttpClient httpClient;
 
         public TimeLoggerPlugin()
         {
-            httpClient = new System.Net.Http.HttpClient();
+            httpClient = new HttpClient();
         }
 
-        public Guid PluginGuid => new Guid("B5AEE497-1C29-4A34-8D1E-4F107A0B5C5D");
-        public string FriendlyName => "Supabase Time Logger Plugin";
-        public string Description => "Logs TimeSnapper events to Supabase edge function endpoint";
-        public string[] SubscribesTo => new[] { 
-            "SnapshotSaved",
-            "ProgramStatistics",
-            "TimeSpentComputing",
-            "DiskSpaceUsage",
-            "FlagSaved",
-            "ProductivityGrades",
-            "ActivityCloud"
-        };
+        public Guid PluginGuid
+        {
+            get { return new Guid("B5AEE497-1C29-4A34-8D1E-4F107A0B5C5D"); }
+        }
+
+        public string FriendlyName
+        {
+            get { return "Supabase Time Logger Plugin"; }
+        }
+
+        public string Description
+        {
+            get { return "Logs TimeSnapper events to Supabase edge function endpoint"; }
+        }
+
+        public string[] SubscribesTo
+        {
+            get
+            {
+                return new[] { 
+                    "SnapshotSaved",
+                    "ProgramStatistics",
+                    "TimeSpentComputing",
+                    "DiskSpaceUsage",
+                    "FlagSaved",
+                    "ProductivityGrades",
+                    "ActivityCloud"
+                };
+            }
+        }
 
         public void HandleEvent(string eventName, object eventData)
         {
-            Console.WriteLine($"Event Received: {eventName} at {DateTime.Now}");
-            System.Threading.Tasks.Task.Run(() => SendToSupabaseAsync(eventName, eventData));
+            Console.WriteLine(string.Format("Event Received: {0} at {1}", eventName, DateTime.Now));
+            Task.Run(() => SendToSupabaseAsync(eventName, eventData));
         }
 
-        private async System.Threading.Tasks.Task SendToSupabaseAsync(string eventName, object eventData)
+        private async Task SendToSupabaseAsync(string eventName, object eventData)
         {
             try
             {
-                var payload = new System.Collections.Generic.Dictionary<string, object>
-                {
-                    { "eventType", eventName },
-                    { "timestamp", DateTime.UtcNow.ToString("o") },
-                    { "data", eventData?.ToString() ?? "No Data" }
-                };
+                var payload = new Dictionary<string, object>();
+                payload.Add("eventType", eventName);
+                payload.Add("timestamp", DateTime.UtcNow.ToString("o"));
+                payload.Add("data", eventData != null ? eventData.ToString() : "No Data");
 
                 switch (eventName)
                 {
                     case "ProgramStatistics":
-                        payload["reportType"] = "program_statistics";
+                        payload.Add("reportType", "program_statistics");
                         break;
                     case "TimeSpentComputing":
-                        payload["reportType"] = "time_spent";
+                        payload.Add("reportType", "time_spent");
                         break;
                     case "DiskSpaceUsage":
-                        payload["reportType"] = "disk_space";
+                        payload.Add("reportType", "disk_space");
                         break;
                     case "FlagSaved":
-                        payload["reportType"] = "flags";
+                        payload.Add("reportType", "flags");
                         break;
                     case "ProductivityGrades":
-                        payload["reportType"] = "productivity";
+                        payload.Add("reportType", "productivity");
                         break;
                     case "ActivityCloud":
-                        payload["reportType"] = "activity";
+                        payload.Add("reportType", "activity");
                         break;
                     default:
-                        payload["reportType"] = "snapshot";
+                        payload.Add("reportType", "snapshot");
                         break;
                 }
 
-                string json = System.Text.Json.JsonSerializer.Serialize(payload);
-                var content = new System.Net.Http.StringContent(json, System.Text.Encoding.UTF8, "application/json");
+                string json = Newtonsoft.Json.JsonConvert.SerializeObject(payload);
+                var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
 
                 var response = await httpClient.PostAsync(ENDPOINT_URL, content);
                 if (response.IsSuccessStatusCode)
                 {
-                    Console.WriteLine($"Successfully sent {eventName} event to Supabase");
+                    Console.WriteLine(string.Format("Successfully sent {0} event to Supabase", eventName));
                 }
                 else
                 {
-                    Console.WriteLine($"Failed to send {eventName} event. Status: {response.StatusCode}");
+                    Console.WriteLine(string.Format("Failed to send {0} event. Status: {1}", eventName, response.StatusCode));
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"Error details: {errorContent}");
+                    Console.WriteLine(string.Format("Error details: {0}", errorContent));
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error sending {eventName} event: {ex.Message}");
+                Console.WriteLine(string.Format("Error sending {0} event: {1}", eventName, ex.Message));
                 if (ex.InnerException != null)
                 {
-                    Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+                    Console.WriteLine(string.Format("Inner exception: {0}", ex.InnerException.Message));
                 }
             }
         }
 
-        public bool Configurable => false;
+        public bool Configurable
+        {
+            get { return false; }
+        }
+
         public void Configure()
         {
-            Console.WriteLine($"TimeSnapper Supabase endpoint: {ENDPOINT_URL}");
+            Console.WriteLine(string.Format("TimeSnapper Supabase endpoint: {0}", ENDPOINT_URL));
         }
 
         public void Dispose()
         {
-            httpClient?.Dispose();
+            if (httpClient != null)
+            {
+                httpClient.Dispose();
+            }
         }
     }
 }
