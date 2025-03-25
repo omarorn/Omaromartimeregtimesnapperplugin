@@ -1,0 +1,82 @@
+@echo off
+echo Searching for MSBuild...
+
+REM Try to find MSBuild in common Visual Studio installation locations
+set FOUND=0
+
+REM Check VS2022 path
+if exist "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\MSBuild.exe" (
+    set MSBUILD_PATH="C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\MSBuild.exe"
+    set FOUND=1
+    goto BUILD
+)
+
+if exist "C:\Program Files\Microsoft Visual Studio\2022\Professional\MSBuild\Current\Bin\MSBuild.exe" (
+    set MSBUILD_PATH="C:\Program Files\Microsoft Visual Studio\2022\Professional\MSBuild\Current\Bin\MSBuild.exe"
+    set FOUND=1
+    goto BUILD
+)
+
+if exist "C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe" (
+    set MSBUILD_PATH="C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe"
+    set FOUND=1
+    goto BUILD
+)
+
+REM Check VS2019 path
+if exist "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe" (
+    set MSBUILD_PATH="C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe"
+    set FOUND=1
+    goto BUILD
+)
+
+if exist "C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\MSBuild\Current\Bin\MSBuild.exe" (
+    set MSBUILD_PATH="C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\MSBuild\Current\Bin\MSBuild.exe"
+    set FOUND=1
+    goto BUILD
+)
+
+if exist "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\MSBuild.exe" (
+    set MSBUILD_PATH="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\MSBuild.exe"
+    set FOUND=1
+    goto BUILD
+)
+
+REM Check .NET Framework path
+if exist "C:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe" (
+    set MSBUILD_PATH="C:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe"
+    set FOUND=1
+    goto BUILD
+)
+
+if exist "C:\Windows\Microsoft.NET\Framework64\v4.0.30319\MSBuild.exe" (
+    set MSBUILD_PATH="C:\Windows\Microsoft.NET\Framework64\v4.0.30319\MSBuild.exe"
+    set FOUND=1
+    goto BUILD
+)
+
+if %FOUND%==0 (
+    echo MSBuild not found. Please install Visual Studio or .NET Framework.
+    exit /b 1
+)
+
+:BUILD
+echo Found MSBuild at %MSBUILD_PATH%
+echo Building TimeLoggerPlugin...
+
+REM Restore NuGet packages
+echo Restoring NuGet packages...
+%MSBUILD_PATH% TimeLoggerPlugin.csproj /t:Restore /p:Configuration=Release
+
+REM Build the project
+echo Building project...
+%MSBUILD_PATH% TimeLoggerPlugin.csproj /p:Configuration=Release
+
+echo Build complete!
+if exist bin\Release\TimeLoggerPlugin.dll (
+    echo TimeLoggerPlugin.dll was successfully built at bin\Release\TimeLoggerPlugin.dll
+) else (
+    echo Build might have failed. Check the output for errors.
+)
+
+pause

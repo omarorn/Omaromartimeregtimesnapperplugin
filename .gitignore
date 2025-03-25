@@ -396,3 +396,19 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# Project specific files
+Gif.Components.dll
+ITimeSnapperPlugIn.dll
+Janus.Windows.Common.v2.dll
+Janus.Windows.GridEX.v2.dll
+OCRPlugIn.exe
+TimeLoggerPlugin.cs
+TimeLoggerPlugin.dll.config
+TimeLoggerPluginold.dll
+TimeSnapper Professional.url
+timesnapper-supabase-plugin.bundle.js
+timesnapper-supabase-plugin.js
+TimeSnapperEULA.rtf
+TSControls.dll
+LIB/
