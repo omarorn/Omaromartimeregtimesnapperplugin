@@ -43,4 +43,5 @@ _ReSharper*/
 # TimeSnapper Plugin specific
 *.dll
 !ITimeSnapperPlugIn.dll
+
 *.pdb

@@ -5,9 +5,15 @@ if (-not (Test-Path $nugetPath)) {
     Invoke-WebRequest -Uri "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" -OutFile $nugetPath
 }
 
+# Create packages directory if it doesn't exist
+$packagesDir = ".\packages"
+if (-not (Test-Path $packagesDir)) {
+    New-Item -ItemType Directory -Path $packagesDir
+}
+
 # Restore NuGet packages
 Write-Host "Restoring NuGet packages..."
-& $nugetPath restore "TimeLoggerPluginAPI/TimeLoggerPluginAPI.csproj"
+& $nugetPath restore "TimeLoggerPluginAPI.sln" -PackagesDirectory $packagesDir
 
 # Find MSBuild
 $vsPath = ""
@@ -16,6 +22,7 @@ $msBuildPath = ""
 $possibleVSPaths = @(
     "C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe",
     "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\MSBuild.exe",
+    "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin\MSBuild.exe",
     "C:\Windows\Microsoft.NET\Framework64\v4.0.30319\MSBuild.exe"
 )
 
@@ -35,7 +42,7 @@ Write-Host "Using MSBuild from: $msBuildPath"
 
 # Build the project
 Write-Host "Building project..."
-& $msBuildPath "TimeLoggerPluginAPI\TimeLoggerPluginAPI.csproj" /p:Configuration=Release /v:minimal
+& $msBuildPath "TimeLoggerPluginAPI.sln" /p:Configuration=Release /v:minimal
 
 if ($LASTEXITCODE -eq 0) {
     $pluginPath = "C:\Program Files (x86)\TimeSnapper\Plugins\TimeLoggerPlugin.dll"

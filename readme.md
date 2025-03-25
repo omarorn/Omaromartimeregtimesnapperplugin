@@ -1,125 +1,95 @@
-# TimeSnapper Plugin Documentation
+# TimeSnapper Supabase Plugin
 
-## English Instructions
+A TimeSnapper plugin that logs activity data to a Supabase edge function endpoint. This plugin captures various TimeSnapper events and sends them to a configured Supabase endpoint for analysis and tracking.
 
-### Plugin Development and Deployment Guide
+## Features
 
-1. **Project Configuration**
-   - Target .NET Framework 4.8 in the project file
-   - Reference ITimeSnapperPlugIn.dll correctly
-   - Ensure plugin class implements required interface
-   - Build using Visual Studio or C# Dev Kit
+- Captures multiple TimeSnapper events:
+  - SnapshotSaved
+  - ProgramStatistics
+  - TimeSpentComputing
+  - DiskSpaceUsage
+  - FlagSaved
+  - ProductivityGrades
+  - ActivityCloud
+- Sends event data to Supabase edge function
+- Real-time activity logging
+- Configurable endpoint
 
-2. **Deployment Steps**
-   - Build the project to generate DLL
-   - Rename output to end with "Plugin.dll"
-   - Copy to: C:\Program Files (x86)\TimeSnapper\Plugins\
-   - Restart TimeSnapper to load plugin
+## Build Requirements
 
-3. **Testing**
-   - Check TimeSnapper logs for plugin loading
-   - Verify event handling (SnapshotSaved, FlagSaved)
-   - Confirm data transmission to X-Function endpoint
+- Visual Studio 2019+ or Visual Studio Build Tools 2019+
+- .NET Framework 4.8 SDK
+- PowerShell 5.1 or higher
+- Administrator privileges (for deployment)
 
----
+## Building and Deploying
 
-## Íslenskar Leiðbeiningar
+1. **Clone the Repository**
+   ```
+   git clone https://github.com/yourusername/timesnapper-supabase-plugin.git
+   cd timesnapper-supabase-plugin
+   ```
 
-### Leiðbeiningar fyrir Þróun og Útsetningu Viðbótar
+2. **Build and Deploy**
+   - Run the build script (requires administrator privileges):
+     ```
+     powershell -ExecutionPolicy Bypass -File build-plugin.ps1
+     ```
+   - The script will:
+     - Clean build directories
+     - Restore NuGet packages
+     - Build the solution
+     - Deploy to TimeSnapper Plugins directory
 
-1. **Verkefnisstillingar**
-   - Notaðu .NET Framework 4.8 í verkefnaskrá
-   - Vísaðu rétt í ITimeSnapperPlugIn.dll
-   - Tryggðu að viðbótarklasinn útfæri rétt viðmót
-   - Byggðu með Visual Studio eða C# Dev Kit
+3. **Verify Installation**
+   - Restart TimeSnapper
+   - The plugin should be loaded automatically
+   - Check TimeSnapper logs for plugin initialization
 
-2. **Útsetningarskref**
-   - Byggðu verkefnið til að búa til DLL
-   - Endurnefndu úttak þannig að það endi á "Plugin.dll"
-   - Afritaðu í: C:\Program Files (x86)\TimeSnapper\Plugins\
-   - Endurræstu TimeSnapper til að hlaða viðbót
+## Configuration
 
-3. **Prófun**
-   - Athugaðu TimeSnapper skrár fyrir hleðslu viðbótar
-   - Staðfestu meðhöndlun atburða (SnapshotSaved, FlagSaved)
-   - Staðfestu gagnasendingu til X-Function endapunkts
-
----
-
-## Development Notes
-
-### Project Structure
+The plugin sends data to the following Supabase endpoint:
 ```
-TimeLoggerPlugin/
-├── TimeLoggerPlugin.cs     # Main plugin implementation
-├── TimeLoggerPlugin.csproj # Project configuration
-└── Properties/
-    └── AssemblyInfo.cs     # Assembly information
+https://npsbvriuvfksuvnalrke.supabase.co/functions/v1/timesnapper-events
 ```
 
-### Required Interface Implementation
-```csharp
-public class TimeLogger : ITimeSnapperPlugIn
-{
-    public Guid PluginGuid => new Guid("B5AEE497-1C29-4A34-8D1E-4F107A0B5C5D");
-    public string FriendlyName => "Time Logger Plugin";
-    public string Description => "Logs time throughout the day and sends data to a super-based X-Function.";
-    public string[] SubscribesTo => new[] { "SnapshotSaved", "FlagSaved" };
-    
-    // Event handling implementation
-    public void HandleEvent(string eventName, object eventData)
-    {
-        // Implementation details in TimeLoggerPlugin.cs
-    }
-}
-```
+## Testing
 
-### Configuration
-1. Update .NET Framework version in .csproj:
-```xml
-<TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-```
+1. **Use the Debug Dashboard**
+   - Open `dashboard.html` in a web browser
+   - Use the "Test Events" tab to send test events
+   - View recent events in the "Recent Events" tab
 
-2. Ensure correct DLL reference:
-```xml
-<Reference Include="ITimeSnapperPlugIn">
-    <HintPath>.\ITimeSnapperPlugIn.dll</HintPath>
-</Reference>
-```
-
-### Building
-```batch
-dotnet build
-```
-
-### Deployment Checklist
-- [ ] Built DLL exists
-- [ ] DLL name ends with "Plugin.dll"
-- [ ] DLL copied to TimeSnapper Plugins folder
-- [ ] TimeSnapper restarted
-- [ ] Plugin appears in TimeSnapper logs
-- [ ] Events are being captured
-- [ ] Data successfully sent to X-Function
+2. **Check Event Logging**
+   - Events are logged to the Supabase database
+   - Check the TimeSnapper console for real-time logging
+   - Use the Supabase dashboard to view stored events
 
 ## Troubleshooting
 
 1. **Plugin Not Loading**
-   - Verify DLL name ends with "Plugin.dll"
-   - Check .NET Framework version matches
-   - Confirm DLL is in correct Plugins folder
-
-2. **Events Not Captured**
-   - Verify SubscribesTo array includes correct event names
+   - Verify the DLL is in the correct location
    - Check TimeSnapper logs for errors
-   - Ensure HandleEvent method is properly implemented
+   - Ensure proper permissions on Plugins folder
 
-3. **Data Not Sending**
-   - Verify X-Function endpoint URL is correct
+2. **Events Not Sending**
    - Check network connectivity
-   - Review error logging in HandleEvent method
+   - Verify Supabase endpoint is accessible
+   - Review plugin logs for errors
+
+3. **Build Issues**
+   - Run build script as administrator
+   - Ensure .NET Framework 4.8 SDK is installed
+   - Clear the build directories manually if needed
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Support
 
 For issues or questions:
-- TimeSnapper Documentation: [TimeSnapper Plugin Development](https://wiki.timesnapper.com/index.php?title=Plugin_Development)
-- Report Issues: [GitHub Issues](https://github.com/OmarOmeiri/Omaromartimeregtimesnapperplugin/issues)
+- Open an issue on GitHub
+- Contact TimeSnapper support for plugin-related questions
+- Check Supabase documentation for endpoint issues
