@@ -70,13 +70,35 @@ echo Restoring NuGet packages...
 
 REM Build the project
 echo Building project...
-%MSBUILD_PATH% TimeLoggerPlugin.csproj /p:Configuration=Release
+%MSBUILD_PATH% TimeLoggerPlugin.csproj /p:Configuration=Release /p:TargetFrameworkVersion=v4.8
 
 echo Build complete!
 if exist bin\Release\TimeLoggerPlugin.dll (
     echo TimeLoggerPlugin.dll was successfully built at bin\Release\TimeLoggerPlugin.dll
+    
+    echo.
+    echo Would you like to copy the plugin to TimeSnapper plugins directory? (Y/N)
+    choice /C YN /M "Copy to TimeSnapper:"
+    
+    if errorlevel 2 goto END
+    if errorlevel 1 (
+        echo.
+        echo Copying plugin to TimeSnapper Plugins directory...
+        
+        if exist "C:\Program Files\TimeSnapper\Plugins\" (
+            copy /Y "bin\Release\TimeLoggerPlugin.dll" "C:\Program Files\TimeSnapper\Plugins\"
+            echo Plugin successfully copied.
+        ) else if exist "C:\Program Files (x86)\TimeSnapper\Plugins\" (
+            copy /Y "bin\Release\TimeLoggerPlugin.dll" "C:\Program Files (x86)\TimeSnapper\Plugins\"
+            echo Plugin successfully copied.
+        ) else (
+            echo TimeSnapper Plugins directory not found.
+            echo Please manually copy bin\Release\TimeLoggerPlugin.dll to your TimeSnapper Plugins directory.
+        )
+    )
 ) else (
     echo Build might have failed. Check the output for errors.
 )
 
+:END
 pause
