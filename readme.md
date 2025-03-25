@@ -122,4 +122,4 @@ dotnet build
 
 For issues or questions:
 - TimeSnapper Documentation: [TimeSnapper Plugin Development](https://wiki.timesnapper.com/index.php?title=Plugin_Development)
-- Report Issues: [GitHub Issues](https://github.com/yourusername/TimeLoggerPlugin/issues)
+- Report Issues: [GitHub Issues](https://github.com/OmarOmeiri/Omaromartimeregtimesnapperplugin/issues)
